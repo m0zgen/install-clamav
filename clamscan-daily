@@ -9,27 +9,29 @@
 PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 
-#
+# Vars
 # ---------------------------------------------------\
 SUBJECT="`hostname` PASSED DAILY SCAN"
 EMAIL="my@mail.ru"
-LOG=/tmp/clamav.log
+LOG=/var/log/clamav.log
 TMP_LOG=/tmp/clam.daily
-
+SERVER_NAME=`hostname`
+#
+# ---------------------------------------------------\
 av_report() {
 
-    if [ `cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l` != 0 ]
+    if [ \`cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l\` != 0 ]
     then
-  SUBJECT="[WARNING] `hostname` PASSED DAILY SCAN"
+      SUBJECT="[WARNING] `hostname` PASSED DAILY SCAN"
     fi
 
-  EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
+    EMAILMESSAGE=`mktemp /tmp/virus-alert.XXXXX`
     echo "To: ${EMAIL}" >>  ${EMAILMESSAGE}
-    echo "From: clamalert@myserver.com" >>  ${EMAILMESSAGE}
+    echo "From: clamavalert@${SERVER_NAME}" >>  ${EMAILMESSAGE}
     echo "Subject: ${SUBJECT}" >>  ${EMAILMESSAGE}
     echo "Importance: High" >> ${EMAILMESSAGE}
     echo "X-Priority: 1" >> ${EMAILMESSAGE}
-    echo "`tail -n 50 ${TMP_LOG}`" >> ${EMAILMESSAGE}
+    echo "\`tail -n 50 ${TMP_LOG}\`" >> ${EMAILMESSAGE}
     sendmail -t < ${EMAILMESSAGE}
 
   cat ${TMP_LOG} >> ${LOG}
