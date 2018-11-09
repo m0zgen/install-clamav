@@ -8,8 +8,20 @@ PATH=$PATH:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 SCRIPT_PATH=$(cd `dirname "${BASH_SOURCE[0]}"` && pwd)
 
 touch /var/log/clamav.log
+SCAN_FILE="/etc/cron.daily/clamscan_daily"
 
-cat >> /etc/cron.daily/clamscan_daily <<_EOF_
+if [ -f $SCAN_FILE ]; then
+   echo "File $FILE exists."
+   rm -rf $SCAN_FILE
+   touch $SCAN_FILE
+else
+   echo "File $FILE does not exist."
+   touch $SCAN_FILE
+fi
+
+
+
+cat >> $SCAN_FILE <<_EOF_
 #!/bin/bash
 # Envs
 # ---------------------------------------------------\
@@ -26,7 +38,7 @@ SERVER_NAME=`hostname`
 # ---------------------------------------------------\
 av_report() {
 
-    if [ `cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l` != 0 ]
+    if [ \`cat ${TMP_LOG}  | grep Infected | grep -v 0 | wc -l\` != 0 ]
     then
       SUBJECT="[WARNING] `hostname` PASSED DAILY SCAN"
     fi
@@ -37,7 +49,7 @@ av_report() {
     echo "Subject: ${SUBJECT}" >>  ${EMAILMESSAGE}
     echo "Importance: High" >> ${EMAILMESSAGE}
     echo "X-Priority: 1" >> ${EMAILMESSAGE}
-    echo "`tail -n 50 ${TMP_LOG}`" >> ${EMAILMESSAGE}
+    echo "\`tail -n 50 ${TMP_LOG}\`" >> ${EMAILMESSAGE}
     sendmail -t < ${EMAILMESSAGE}
 
   cat ${TMP_LOG} >> ${LOG}
@@ -53,4 +65,4 @@ av_scan
 av_report
 _EOF_
 
-chmod +x /usr/local/clamav/script/clamscan_daily
+chmod +x $SCAN_FILE
