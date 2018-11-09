@@ -66,3 +66,5 @@ av_report
 _EOF_
 
 chmod +x $SCAN_FILE
+
+echo -e "Done!"
