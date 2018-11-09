@@ -6,28 +6,11 @@
 # ---------------------------------------------------\
 yum install clamav clamav-update clamav-scanner-systemd -y
 
-# On Fedora file exist, on CentOS file does not exist
-# ---------------------------------------------------\
-FILE="/etc/clamd.conf"
+sleep 15
 
-if [ -f $FILE ]; then
-  echo "$FILE exists..."
-  # sed -i 's/#Example.*/Example/' /etc/clamd.d/scan.conf
-  # sed -i 's/#LocalSocket \/var.*/LocalSocket \/var\/run\/clamd.scan\/clamd.sock/' /etc/clamd.d/scan.conf
-  # sed -i 's/#ExitOnOOM.*/ExitOnOOM yes/' /etc/clamd.d/scan.conf
-
-  sed -i -e "s/^Example/#Example/" /etc/clamd.d/scan.conf
-  sed -i 's/.\(LocalSocket \/var\/run*.\)/\1/g' /etc/clamd.d/scan.conf
-  sed -i 's/.\(ExitOnOOM*.\)/\1/g' /etc/clamd.d/scan.conf
-else
-   echo "$FILE does not exist..."
-cat >> /etc/clamd.conf <<_EOF_
-LogSyslog yes
-LocalSocket /var/run/clamd.scan/clamd.sock
-User clamscan
-ExitOnOOM yes
-_EOF_
-fi
+sed -i -e "s/^Example/#Example/" /etc/clamd.d/scan.conf
+sed -i 's/.\(LocalSocket \/var\/run*.\)/\1/g' /etc/clamd.d/scan.conf
+sed -i 's/.\(ExitOnOOM*.\)/\1/g' /etc/clamd.d/scan.conf
 
 ln -s /etc/clamd.d/scan.conf /etc/clamd.conf
 
