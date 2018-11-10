@@ -5,8 +5,17 @@
 # Install ClamAV
 # ---------------------------------------------------\
 
+Info() {
+  printf "\033[1;32m$@\033[0m\n"
+}
+
+Warning()
+{
+  printf "\033[1;31m$@\033[0m\n"
+
+
 if [[ -f /etc/clamd.d/scan.conf ]]; then
-  echo "ClamAV already installed!"
+  Warning "ClamAV already installed!"
   exit 1
 fi
 
@@ -36,6 +45,11 @@ systemctl enable clamd@scan
 
 # Create daily update schedule for ClamAV
 # ---------------------------------------------------\
+
+if [[ -f /etc/cron.daily/freshclam ]]; then
+  yes | rm -r /etc/cron.daily/freshclam
+fi
+
 cat >> /etc/cron.daily/freshclam <<_EOF_
 #!/bin/bash
 freshclam -v >> /var/log/freshclam.log
@@ -68,6 +82,7 @@ systemctl start freshclam.service
 # ---------------------------------------------------\
 systemctl status clamd@scan
 systemctl status freshclam.service
-echo -e "Done!"
+Info "Done!"
 
-echo -e "You will can check installed anti-virus with test virus files:\nwget http://www.eicar.org/download/eicar.com && wget http://www.eicar.org/download/eicar_com.zip"
+echo -e "You will can check installed anti-virus with test virus files:"
+Info "wget http://www.eicar.org/download/eicar.com && wget http://www.eicar.org/download/eicar_com.zip"
