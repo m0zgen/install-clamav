@@ -44,9 +44,30 @@ _EOF_
 chmod 755 /etc/cron.daily/freshclam
 chmod +x /etc/cron.daily/freshclam
 
+# Install update service
+cat >> /usr/lib/systemd/system/freshclam.service <<_EOF_
+# Run the freshclam as daemon
+[Unit]
+Description = freshclam scanner
+After = network.target
+
+[Service]
+Type = forking
+ExecStart = /usr/bin/freshclam -d -c 4
+Restart = on-failure
+PrivateTmp = true
+
+[Install]
+WantedBy=multi-user.target
+_EOF_
+
+systemctl enable freshclam.service
+systemctl start freshclam.service
+
 # Done!
 # ---------------------------------------------------\
 systemctl status clamd@scan
+systemctl status freshclam.service
 echo -e "Done!"
 
 echo -e "You will can check installed anti-virus with test virus files:\nwget http://www.eicar.org/download/eicar.com && wget http://www.eicar.org/download/eicar_com.zip"
