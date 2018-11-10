@@ -47,3 +47,5 @@ chmod 755 /etc/cron.daily/freshclam
 # ---------------------------------------------------\
 systemctl status clamd@scan
 echo -e "Done!"
+
+echo -e "You will can check installed anti-virus with test virus files:\nwget http://www.eicar.org/download/eicar.com && wget http://www.eicar.org/download/eicar_com.zip"
