@@ -4,6 +4,12 @@
 
 # Install ClamAV
 # ---------------------------------------------------\
+
+if [[ -f /etc/clamd.d/scan.conf ]]; then
+  echo "ClamAV already installed!"
+  exit 1
+fi
+
 yum install clamav clamav-update clamav-scanner-systemd -y
 
 sleep 15
