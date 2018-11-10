@@ -42,6 +42,7 @@ freshclam -v >> /var/log/freshclam.log
 _EOF_
 
 chmod 755 /etc/cron.daily/freshclam
+chmod +x /etc/cron.daily/freshclam
 
 # Done!
 # ---------------------------------------------------\
