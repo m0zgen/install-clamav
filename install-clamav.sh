@@ -12,6 +12,7 @@ Info() {
 Warning()
 {
   printf "\033[1;31m$@\033[0m\n"
+}
 
 
 if [[ -f /etc/clamd.d/scan.conf ]]; then
