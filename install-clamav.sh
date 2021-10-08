@@ -39,10 +39,14 @@ setsebool -P clamd_use_jit on
 # ---------------------------------------------------\
 freshclam -v
 
+# Fix socket permissions
+# ---------------------------------------------------\
+mkdir /run/clamd.scan
+chown clamscan:clamscan /run/clamd.scan/
+
 # Enable and start ClamAV
 # ---------------------------------------------------\
-systemctl start clamd@scan
-systemctl enable clamd@scan
+systemctl enable --now clamd@scan
 
 # Create daily update schedule for ClamAV
 # ---------------------------------------------------\
