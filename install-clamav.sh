@@ -33,6 +33,7 @@ sed -i -e "s/#LogFile .*/LogFile \/var\/log\/clamav\/scan.log/" /etc/clamd.d/sca
 sed -i -e "s/#LogFileMaxSize.*/LogFileMaxSize 0/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LogTime.*/LogTime yes/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LocalSocket .*/LocalSocket \/run\/clamd.scan\/clamd.sock/" /etc/clamd.d/scan.conf
 
 sed -i -e "s/#UpdateLogFile .*/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
 sed -i -e "s/#LogFileMaxSize/.*LogFileMaxSize 0/" /etc/freshclam.conf
