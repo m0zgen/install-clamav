@@ -36,7 +36,7 @@ sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LocalSocket .*/LocalSocket \/run\/clamd.scan\/clamd.sock/" /etc/clamd.d/scan.conf
 
 sed -i -e "s/#UpdateLogFile .*/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
-sed -i -e "s/#LogFileMaxSize/.*LogFileMaxSize 0/" /etc/freshclam.conf
+sed -i -e "s/#LogFileMaxSize.*/LogFileMaxSize 0/" /etc/freshclam.conf
 sed -i -e "s/#LogTime.*/LogTime yes/" /etc/freshclam.conf
 sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/freshclam.conf
 
@@ -59,10 +59,6 @@ chown clamscan:clamscan /run/clamd.scan/
 # Logs
 mkdir /var/log/clamav
 chown clamscan:clamupdate /var/log/clamav/
-
-# Enable and start ClamAV
-# ---------------------------------------------------\
-systemctl enable --now clamd@scan
 
 # Create daily update schedule for ClamAV
 # ---------------------------------------------------\
@@ -98,6 +94,8 @@ WantedBy=multi-user.target
 _EOF_
 
 systemctl enable --now freshclam.service
+sleep 10
+systemctl enable --now clamd@scan.service
 
 # Enable logrotate
 # ---------------------------------------------------\
@@ -123,7 +121,7 @@ logrotate /etc/logrotate.d/clamav
 
 # Done!
 # ---------------------------------------------------\
-systemctl status clamd@scan
+systemctl status clamd@scan.service
 systemctl status freshclam.service
 Info "Done!"
 
