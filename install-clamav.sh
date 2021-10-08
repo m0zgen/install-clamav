@@ -73,7 +73,7 @@ fi
 
 cat >> /etc/cron.daily/freshclam <<_EOF_
 #!/bin/bash
-freshclam -v >> /var/log/freshclam.log
+freshclam -v >> /var/log/clamav/freshclam.log
 _EOF_
 
 chmod 755 /etc/cron.daily/freshclam
