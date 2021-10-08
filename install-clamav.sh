@@ -28,6 +28,17 @@ sed -i -e "s/^Example/#Example/" /etc/clamd.d/scan.conf
 sed -i 's/.\(LocalSocket \/var\/run*.\)/\1/g' /etc/clamd.d/scan.conf
 sed -i 's/.\(ExitOnOOM*.\)/\1/g' /etc/clamd.d/scan.conf
 
+# Log settings
+sed -i -e "s/^LogFile/LogFile \/var\/log\/clamav\/scan.log/" /etc/clamd.d/scan.conf
+sed -i -e "s/^LogFileMaxSize/LogFileMaxSize 0/" /etc/clamd.d/scan.conf
+sed -i -e "s/^LogTime/LogTime yes/" /etc/clamd.d/scan.conf
+sed -i -e "s/^LogSyslog/LogSyslog yes/" /etc/clamd.d/scan.conf
+
+sed -i -e "s/^UpdateLogFile/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
+sed -i -e "s/^LogFileMaxSize/LogFileMaxSize 0/" /etc/freshclam.conf
+sed -i -e "s/^LogTime/LogTime yes/" /etc/freshclam.conf
+sed -i -e "s/^LogSyslog/LogSyslog yes/" /etc/freshclam.conf
+
 ln -s /etc/clamd.d/scan.conf /etc/clamd.conf
 
 # SELinux
@@ -43,6 +54,10 @@ freshclam -v
 # ---------------------------------------------------\
 mkdir /run/clamd.scan
 chown clamscan:clamscan /run/clamd.scan/
+
+# Logs
+mkdir /var/log/clamav
+chown clamscan:clamupdate /var/log/clamav/
 
 # Enable and start ClamAV
 # ---------------------------------------------------\
@@ -64,6 +79,7 @@ chmod 755 /etc/cron.daily/freshclam
 chmod +x /etc/cron.daily/freshclam
 
 # Install update service
+# ---------------------------------------------------\
 cat >> /usr/lib/systemd/system/freshclam.service <<_EOF_
 # Run the freshclam as daemon
 [Unit]
@@ -80,8 +96,29 @@ PrivateTmp = true
 WantedBy=multi-user.target
 _EOF_
 
-systemctl enable freshclam.service
-systemctl start freshclam.service
+systemctl enable --now freshclam.service
+
+# Enable logrotate
+# ---------------------------------------------------\
+cat >> /etc/logrotate.d/clamav <<_EOF_
+/var/log/clamav/*.log {
+    su clamscan clamupdate
+ #   weekly
+    hourly
+    rotate 5
+    compress
+    delaycompress
+    notifempty
+    missingok
+    create 0660 clamscan clamupdate
+    postrotate
+    /bin/kill -HUP `cat /var/run/clamav/clamd.pid 2>/dev/null` 2>/dev/null || true
+    /bin/kill -HUP `cat /var/run/clamav/freshclam.pid 2>/dev/null` 2>/dev/null || true
+    endscript
+}
+_EOF_
+
+logrotate /etc/logrotate.d/clamav
 
 # Done!
 # ---------------------------------------------------\
