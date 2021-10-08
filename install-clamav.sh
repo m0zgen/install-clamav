@@ -29,15 +29,15 @@ sed -i 's/.\(LocalSocket \/var\/run*.\)/\1/g' /etc/clamd.d/scan.conf
 sed -i 's/.\(ExitOnOOM*.\)/\1/g' /etc/clamd.d/scan.conf
 
 # Log settings
-sed -i -e "s/^LogFile/LogFile \/var\/log\/clamav\/scan.log/" /etc/clamd.d/scan.conf
-sed -i -e "s/^LogFileMaxSize/LogFileMaxSize 0/" /etc/clamd.d/scan.conf
-sed -i -e "s/^LogTime/LogTime yes/" /etc/clamd.d/scan.conf
-sed -i -e "s/^LogSyslog/LogSyslog yes/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LogFile .*/LogFile \/var\/log\/clamav\/scan.log/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LogFileMaxSize.*/LogFileMaxSize 0/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LogTime.*/LogTime yes/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/clamd.d/scan.conf
 
-sed -i -e "s/^UpdateLogFile/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
-sed -i -e "s/^LogFileMaxSize/LogFileMaxSize 0/" /etc/freshclam.conf
-sed -i -e "s/^LogTime/LogTime yes/" /etc/freshclam.conf
-sed -i -e "s/^LogSyslog/LogSyslog yes/" /etc/freshclam.conf
+sed -i -e "s/#UpdateLogFile .*/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
+sed -i -e "s/#LogFileMaxSize/.*LogFileMaxSize 0/" /etc/freshclam.conf
+sed -i -e "s/#LogTime.*/LogTime yes/" /etc/freshclam.conf
+sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/freshclam.conf
 
 ln -s /etc/clamd.d/scan.conf /etc/clamd.conf
 
