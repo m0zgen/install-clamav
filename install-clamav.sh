@@ -47,10 +47,6 @@ ln -s /etc/clamd.d/scan.conf /etc/clamd.conf
 setsebool -P antivirus_can_scan_system on
 setsebool -P clamd_use_jit on
 
-# Update ClamAV
-# ---------------------------------------------------\
-freshclam -v
-
 # Fix socket permissions
 # ---------------------------------------------------\
 mkdir /run/clamd.scan
@@ -88,10 +84,16 @@ Type = forking
 ExecStart = /usr/bin/freshclam -d -c 4
 Restart = on-failure
 PrivateTmp = true
+# Reload service
+ExecReload=/bin/kill -HUP \$MAINPID
 
 [Install]
 WantedBy=multi-user.target
 _EOF_
+
+# Update ClamAV
+# ---------------------------------------------------\
+freshclam -v
 
 systemctl enable --now freshclam.service
 sleep 10
@@ -111,8 +113,10 @@ cat >> /etc/logrotate.d/clamav <<_EOF_
     missingok
     create 0660 clamscan clamupdate
     postrotate
-    /bin/kill -HUP `cat /var/run/clamav/clamd.pid 2>/dev/null` 2>/dev/null || true
-    /bin/kill -HUP `cat /var/run/clamav/freshclam.pid 2>/dev/null` 2>/dev/null || true
+    /usr/bin/systemctl reload clamd@scan.service
+    /usr/bin/systemctl reload freshclam.service
+  #  /bin/kill -HUP `cat /var/run/clamav/clamd.pid 2>/dev/null` 2>/dev/null || true
+  #  /bin/kill -HUP `cat /var/run/clamav/freshclam.pid 2>/dev/null` 2>/dev/null || true
     endscript
 }
 _EOF_
