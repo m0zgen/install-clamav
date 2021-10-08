@@ -56,6 +56,9 @@ chown clamscan:clamscan /run/clamd.scan/
 mkdir /var/log/clamav
 chown clamscan:clamupdate /var/log/clamav/
 
+touch /var/log/clamav/freshclam.log
+chown clamupdate:clamupdate /var/log/clamav/freshclam.log
+
 # Create daily update schedule for ClamAV
 # ---------------------------------------------------\
 
