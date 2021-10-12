@@ -29,13 +29,13 @@ sed -i 's/.\(LocalSocket \/var\/run*.\)/\1/g' /etc/clamd.d/scan.conf
 sed -i 's/.\(ExitOnOOM*.\)/\1/g' /etc/clamd.d/scan.conf
 
 # Log settings
-sed -i -e "s/#LogFile .*/LogFile \/var\/log\/clamav\/scan.log/" /etc/clamd.d/scan.conf
+sed -i -e "s/#LogFile .*/LogFile \/var\/log\/clamd.scan/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LogFileMaxSize.*/LogFileMaxSize 0/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LogTime.*/LogTime yes/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/clamd.d/scan.conf
 sed -i -e "s/#LocalSocket .*/LocalSocket \/run\/clamd.scan\/clamd.sock/" /etc/clamd.d/scan.conf
 
-sed -i -e "s/#UpdateLogFile .*/UpdateLogFile \/var\/log\/clamav\/freshclam.log/" /etc/freshclam.conf
+sed -i -e "s/#UpdateLogFile .*/UpdateLogFile \/var\/log\/freshclam.log/" /etc/freshclam.conf
 sed -i -e "s/#LogFileMaxSize.*/LogFileMaxSize 0/" /etc/freshclam.conf
 sed -i -e "s/#LogTime.*/LogTime yes/" /etc/freshclam.conf
 sed -i -e "s/#LogSyslog.*/LogSyslog yes/" /etc/freshclam.conf
@@ -96,35 +96,48 @@ _EOF_
 
 # Update ClamAV
 # ---------------------------------------------------\
+if [[ -f /var/log/freshclam.log ]]; then
+  yes | rm -r /var/log/freshclam.log
+fi
+
 freshclam -v
 
 systemctl enable --now freshclam.service
 sleep 10
 systemctl enable --now clamd@scan.service
 
-# Enable logrotate
+# Enable / Update logrotate
 # ---------------------------------------------------\
-cat >> /etc/logrotate.d/clamav <<_EOF_
-/var/log/clamav/*.log {
-    su clamscan clamupdate
- #   weekly
-    hourly
-    rotate 5
+cat > /etc/logrotate.d/clamd_scan <<_EOF_
+/var/log/clamd.scan {
+#  su clamscan clamupdate
+    monthly
+    rotate 14
     compress
     delaycompress
     notifempty
     missingok
-    create 0660 clamscan clamupdate
+    create 0660 clamscan clamscan
     postrotate
-    /usr/bin/systemctl reload clamd@scan.service
-    /usr/bin/systemctl reload freshclam.service
-  #  /bin/kill -HUP `cat /var/run/clamav/clamd.pid 2>/dev/null` 2>/dev/null || true
-  #  /bin/kill -HUP `cat /var/run/clamav/freshclam.pid 2>/dev/null` 2>/dev/null || true
+    /usr/bin/systemctl try-restart clamd@scan
     endscript
 }
 _EOF_
 
-logrotate /etc/logrotate.d/clamav
+cat > /etc/logrotate.d/clamav-update <<_EOF_
+/var/log/freshclam.log {
+    monthly
+    rotate 14
+    notifempty
+    missingok
+    postrotate
+    systemctl try-restart clamav-freshclam.service
+    endscript
+}
+_EOF_
+
+logrotate -v /etc/logrotate.d/clamd_scan
+logrotate -v /etc/logrotate.d/clamav-update
 
 # Done!
 # ---------------------------------------------------\
