@@ -130,6 +130,7 @@ cat > /etc/logrotate.d/clamav-update <<_EOF_
     rotate 14
     notifempty
     missingok
+    create 0660 clamupdate clamupdate
     postrotate
     systemctl try-restart clamav-freshclam.service
     endscript
@@ -141,6 +142,9 @@ logrotate -v /etc/logrotate.d/clamav-update
 
 # Done!
 # ---------------------------------------------------\
+sleep 10
+systemctl restart clamd@scan
+
 systemctl status clamd@scan.service
 systemctl status freshclam.service
 Info "Done!"
