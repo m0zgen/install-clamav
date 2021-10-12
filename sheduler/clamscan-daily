@@ -27,8 +27,8 @@ av_report() {
     echo "`tail -n 50 ${TMP_LOG}`" >> ${EMAILMESSAGE}
     sendmail -t < ${EMAILMESSAGE}
 
-  cat ${TMP_LOG} >> ${LOG}
-  rm -rf ${TMP_LOG}
+  # cat ${TMP_LOG} >> ${LOG}
+  # rm -rf ${TMP_LOG}
 }
 
 av_scan() {
