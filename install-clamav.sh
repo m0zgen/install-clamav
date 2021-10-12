@@ -100,11 +100,9 @@ if [[ -f /var/log/freshclam.log ]]; then
   yes | rm -r /var/log/freshclam.log
 fi
 
-freshclam -v
-
 systemctl enable --now freshclam.service
-sleep 10
-systemctl enable --now clamd@scan.service
+sleep 3
+freshclam -v
 
 # Enable / Update logrotate
 # ---------------------------------------------------\
@@ -142,8 +140,8 @@ logrotate -v /etc/logrotate.d/clamav-update
 
 # Done!
 # ---------------------------------------------------\
-sleep 10
-systemctl restart clamd@scan
+sleep 3
+systemctl enable --now clamd@scan.service
 
 systemctl status clamd@scan.service
 systemctl status freshclam.service
