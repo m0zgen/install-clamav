@@ -6,9 +6,9 @@
 
 #!/bin/bash
 SUBJECT="`hostname` PASSED DAILY SCAN"
-EMAIL="my@mail.ru"
+EMAIL="root@localhost"
 LOG=/tmp/clamav.log
-TMP_LOG=/tmp/clam.daily
+TMP_LOG=/var/log/clamscan.log
 SERVER_NAME=`hostname`
 
 av_report() {
