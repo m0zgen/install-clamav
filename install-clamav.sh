@@ -49,7 +49,10 @@ setsebool -P clamd_use_jit on
 
 # Fix socket permissions
 # ---------------------------------------------------\
-mkdir /run/clamd.scan
+if [[ ! -d /run/clamd.scan ]]; then
+  mkdir /run/clamd.scan
+fi
+
 chown clamscan:clamscan /run/clamd.scan/
 
 # Logs
