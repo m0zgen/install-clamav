@@ -32,7 +32,10 @@ av_report() {
 }
 
 av_scan() {
-  touch ${TMP_LOG}
+  if [[ ! -d "$TMP_LOG" ]]; then
+    touch ${TMP_LOG}
+  fi
+  
   nice -n15 clamscan -r / --exclude-dir=/sys/ --quiet --infected --log=${TMP_LOG}
 }
 
